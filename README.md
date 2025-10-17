@@ -13,8 +13,8 @@ This service provides REST endpoints for air quality, sensor data, user manageme
 | Server | **Uvicorn** | ASGI server used for local/dev runs |
 | ORM | **SQLAlchemy** | Database abstraction and queries |
 | Migration Tool | **Alembic** | Handles schema versioning |
-| Database | **PostgreSQL** (default) | Relational DB used in staging/prod |
-| Local DB | **SQLite** (optional) | Lightweight dev database |
+| Database | **PostgreSQL** | Relational DB used in staging/prod |
+| Local DB | **DuckDB** | Lightweight dev database |
 | Auth | **FastAPI Users + python-jose + passlib** | JWT authentication and password hashing |
 | Logging | **Loguru + python-json-logger** | Structured logs for cloud environments |
 | Audit Trail | **Starlette Middleware** | Automatic logging of POST/PUT/DELETE actions |
@@ -30,23 +30,101 @@ This service provides REST endpoints for air quality, sensor data, user manageme
 ```
 
 klima-api/
+│
+├── alembic/			                # PostgreSQL migrations
+│
 ├── app/
-│   ├── main.py              # FastAPI entrypoint
-│   ├── models/              # SQLAlchemy models
-│   ├── routes/              # API endpoints
-│   ├── core/
-│   │   ├── config.py        # Settings from .env
-│   │   ├── database.py      # DB engine setup
-│   │   ├── security.py      # JWT / auth utils
-│   ├── utils/               # Helpers, logging setup
-│   ├── audit/               # fastapi-audit-trails setup
-│   └── **init**.py
-├── alembic/                 # DB migrations
-├── .env.example             # Environment template
+│   ├── __init__.py
+│   ├── main.py		                # FastAPI entrypoint
+│   │
+│   ├── api/				              # REST API routes
+│   │   ├── __init__.py
+│   │   └── v1/			              # Versioned API (v1 for now)
+│   │       ├── __init__.py
+│   │       ├── api.py			      # Central router (includes all v1 endpoints)
+│   │       └── endpoints/
+│   │           ├── __init__.py
+│   │           ├── klima.py		  # Handles reports from the Klima mobile app
+│   │           │				            (/api/v1/klima)
+│   │           ├── messenger.py 	# Handles webhook events and reports from
+│   │           │				            Messenger (/api/v1/messenger)
+│   │           ├── telegram.py   # (Future) Planned integration for receiving
+│   │           │				            reports via Telegram bot 
+│   │           ├── viber.py      # (Future) Planned integration for receiving
+│   │           │				            reports via Viber bot
+│   │           └── dashboard.py	# LGU dashboard data API (/api/v1/dashboard)
+│   │
+│   ├── audit/                    # fastapi-audit-trails setup
+│   │
+│   ├── core/				              # Core configuration and utilities
+│   │   ├── __init__.py
+│   │   ├── config.py		  	      # Loads settings from .env
+│   │   ├── database.py           # PostgreSQL setup
+│   │   └── security.py           # JWT / auth utils
+│   │
+│   ├── db/			                 	# Database connection and query utilities
+│   │   ├── __init__.py
+│   │   └── connection.py		      # DuckDB connection utilities
+│   │
+│   ├── models/                   # SQLAlchemy models
+│   │   ├── __init__.py
+│   │   ...
+│   │   
+│   ├── schemas/			            # Pydantic models
+│   │   ├── __init__.py
+│   │   ├── user_reports.py		    # Schema for user reports coming from Klima
+│   │   │					                  mobile app, Messenger, etc.
+│   │   ├── dashboard.py		      # Schema for LGU dashboard data responses
+│   │   ...
+│   │
+│   ├── services/                 # Business logic
+│   │   ├── __init__.py
+│   │   ...
+│   │
+│   └── utils/                    # Helpers, logging setup
+│
+├── data/			                  	# Local DuckDB databases
+│   ├── bronze.duckdb		          # Raw ingested data
+│   ├── silver.duckdb		        	# Cleaned and transformed datasets
+│   └── gold.duckdb			          # Aggregated, analytics-ready tables
+│
+├── pipeline/				              # ELT pipeline: ingestion → transform → aggregate
+│   ├── __init__.py
+│   │
+│   ├── bronze/			              # Raw data ingestion
+│   │   ├── __init__.py
+│   │   ├── pagasa.py		          # Fetches data from PAGASA APIs
+│   │   ...
+│   │
+│   ├── silver/				            # Data cleaning and transformation
+│   │   ├── __init__.py
+│   │   ...
+│   │
+│   ├── gold/ 				            # Data aggregation and enrichment
+│   │   ├── __init__.py
+│   │   ...
+│   │
+│   └── scheduler.py			        # Custom scheduler/orchestrator for pipeline runs
+│ 					                        (e.g., cron-style updates or async tasks)
+│
+├── scripts/               			  # Utility scripts for development/testing
+│   ├── init_dbs.py			          # Creates initial DuckDB files/tables
+│   └── run_pipeline.py		        # Manually triggers the full ELT pipeline
+│
+├── tests/			                	# Unit and integration tests
+│   ├── __init__.py
+│   └── test_main.py		        	# Basic FastAPI endpoint tests
+│
+├── .env.example                  # Environment template
+├── .gitignore			
+├── .python-version		          	# Python version pin (for uv)
 ├── Dockerfile
 ├── docker-compose.yml
-├── requirements.txt
-└── README.md
+├── LICENSE
+├── pyproject.toml		          	# Project dependencies and metadata
+├── README.md			
+└── uv.lock                       # Dependency lockfile (generated by uv)
+
 
 ````
 
