@@ -1,7 +1,9 @@
 # pipeline/utils/extract_http.py
 import time
+
 import requests
 from requests.exceptions import JSONDecodeError, RequestException
+
 
 def extract_http(
     source: str,
@@ -11,10 +13,10 @@ def extract_http(
     retries: int = 3,
     delay: int = 5,
     timeout: int = 10,
-    **kwargs
+    **kwargs,
 ):
     """
-    Fetches and validates an API response with retries, 
+    Fetches and validates an API response with retries,
     ensuring JSON validity and graceful error handling.
 
     Args:
@@ -37,11 +39,7 @@ def extract_http(
         try:
             print(f"🔄 Fetching from {source} (attempt {attempt})...")
             response = requests.request(
-                method,
-                url,
-                headers=headers,
-                timeout=timeout,
-                **kwargs
+                method, url, headers=headers, timeout=timeout, **kwargs
             )
 
             # Check HTTP status

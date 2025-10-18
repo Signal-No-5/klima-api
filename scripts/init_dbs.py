@@ -1,12 +1,12 @@
-import duckdb
 from pathlib import Path
 
+import duckdb
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DBS = {
     "bronze": DATA_DIR / "bronze.duckdb",
     "silver": DATA_DIR / "silver.duckdb",
-    "gold": DATA_DIR / "gold.duckdb"
+    "gold": DATA_DIR / "gold.duckdb",
 }
 
 
@@ -20,6 +20,7 @@ def init_databases():
             duckdb.connect(str(db_path)).close()
         else:
             print(f"The {name} database already exists at {db_path}")
+
 
 if __name__ == "__main__":
     init_databases()
