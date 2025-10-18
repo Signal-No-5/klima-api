@@ -22,3 +22,20 @@ dependencies = [
     "sqlmodel>=0.0.27",
     "uvicorn[standard]>=0.37.0",
 ]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+combine_as_imports = true
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.ruff]
+line-length = 88
+fix = true
+lint.select = ["E", "F", "W", "I"]   # Ruff rule codes: style, pyflakes, etc.
+exclude = ["venv/*", "build/*", "dist/*", "__pycache__/*"]

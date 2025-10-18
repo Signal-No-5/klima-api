@@ -1,0 +1,12 @@
+{
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always"
+    },
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.linting.ruffArgs": ["--fix"],
+    "python.sortImports.args": ["--profile", "black"],
+    "python.analysis.extraPaths": ["./src"]  // optional if you use a src/ layout
+}
