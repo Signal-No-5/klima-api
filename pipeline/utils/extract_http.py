@@ -1,16 +1,14 @@
-# pipeline/utils/extract_http.py
 import time
 
-import requests
+from requests import request
 from requests.exceptions import JSONDecodeError, RequestException
 
 
 def extract_http(
-    source: str,
     method: str,
-    url: str,
+    source: str,
     headers: dict = None,
-    retries: int = 3,
+    retry: int = 3,
     delay: int = 5,
     timeout: int = 10,
     **kwargs,
@@ -20,9 +18,8 @@ def extract_http(
     ensuring JSON validity and graceful error handling.
 
     Args:
-        source (str): Display name for logs/errors.
         method (str): HTTP method ("GET", "POST", etc.).
-        url (str): API endpoint.
+        source (str): API endpoint.
         headers (dict): Optional HTTP headers.
         retries (int): Number of retry attempts.
         delay (int): Delay (seconds) between retries.
@@ -35,11 +32,11 @@ def extract_http(
         Exception: Descriptive error message if request fails.
     """
 
-    for attempt in range(1, retries + 1):
+    for attempt in range(1, retry + 1):
         try:
             print(f"🔄 Fetching from {source} (attempt {attempt})...")
-            response = requests.request(
-                method, url, headers=headers, timeout=timeout, **kwargs
+            response = request(
+                method, source, headers=headers, timeout=timeout, **kwargs
             )
 
             # Check HTTP status
@@ -57,10 +54,10 @@ def extract_http(
                     snippet = "empty data."
                 raise Exception(
                     f"Response status: {response.status_code}\n"
-                    f"{source} returned {snippet}"
+                    f"{source} returned {snippet}\n"
                 )
 
-            print(f"✅ Successfully fetched from {source}.")
+            print(f"✅ Successfully fetched from {source}.\n")
             return data
 
         except RequestException as e:
@@ -69,8 +66,8 @@ def extract_http(
             print(f"⚠️ {e}")
 
         # Only sleep if not the last attempt
-        if attempt < retries:
+        if attempt < retry:
             print(f"⏳ Retrying in {delay} seconds...")
             time.sleep(delay)
 
-    raise Exception(f"❌ Failed to fetch from {source} after {retries} attempts.")
+    raise Exception(f"❌ Failed to fetch from {source} after {retry} attempts.")
