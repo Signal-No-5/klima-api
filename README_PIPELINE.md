@@ -2,7 +2,7 @@
 
 **Author:** Philip Ma, Data Engineer of Team Signal #5
 
-**Last updated:** October 23, 2025
+**Last updated:** October 26, 2025
 
 ---
 
@@ -10,9 +10,9 @@
 
 KLIMA is a disaster intelligence platform designed to **predict, assess, and communicate risk** across the Philippines.
 
-This document provides an overview of the **data pipeline** located in `klima-api/pipeline/`. In the future, this pipeline may evolve into a standalone backend service and separate repository.
+This document provides an overview of the **data pipeline** located in `klima-api/pipeline/`. It describes the pipeline’s **architecture**, **design rationale**, and **data flow**, highlighting how modular engineering principles support KLIMA’s broader goal of disaster resilience through data.
 
-It describes the pipeline’s **architecture**, **design rationale**, and **data flow**, highlighting how modular engineering principles support KLIMA’s broader goal of disaster resilience through data.
+In the future, this pipeline may evolve into a standalone backend service and separate repository.
 
 ---
 
@@ -22,16 +22,19 @@ The KLIMA pipeline follows a **modular, asset-oriented philosophy** inspired by 
 
 It implements the **Medallion Architecture**, which organizes data transformations into three distinct stages:
 
-* **🟫 Bronze Stage – Raw ingestion**
+* **🥉 Bronze Stage – Raw ingestion**
   - Collects unmodified data from APIs and other external sources.
-  - Serves as a single source of truth for raw observations.
+  - Serves as the single source of truth for raw observations.
 
-* **⬜ Silver Stage – Cleaned and standardized assets**
+* **🥈 Silver Stage – Cleaned and standardized assets**
   - Transforms and normalizes bronze data into structured tables.
   - Ensures data consistency through standardized schemas and validation.
 
-* **🟨 Gold Stage – Aggregated and analytical outputs**
-  - Merges silver assets into higher-level insights such as risk levels, alert triggers, and reports for LGUs and citizens.
+* **🥇 Gold Stage – Aggregated and analytical outputs**
+  - Merges silver assets into higher-level insights that fuel downstream systems.
+  - Powers alerts, dashboards, and reports that inform decisions and raise public awareness.
+
+Together, these stages form KLIMA’s data lifecycle — a continuous flow of **collection → transformation → action**.
 
 ### 🧩 Asset-Oriented Design
 
